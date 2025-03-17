@@ -1,12 +1,10 @@
 package db
 
 import (
-	"fmt"
 	"log"
 	"path/filepath"
 	"sync"
 
-	"github.com/tidwall/gjson"
 	"go.etcd.io/bbolt"
 )
 
@@ -59,26 +57,18 @@ func CreateBucketIfNotExists(tx *bbolt.Tx, name []byte, dirty *bool) (*bbolt.Buc
 	return bkt, nil
 }
 
-func ListGetAll(bucket string, key string) (list [][]byte, err error) {
+func GetBucketAll(bucket string) (items map[string][]byte, err error) {
 	err = Transaction(DB(), func(tx *bbolt.Tx) (bool, error) {
 		dirty := false
 		if bkt, err := CreateBucketIfNotExists(tx, []byte(bucket), &dirty); err != nil {
 			return dirty, err
 		} else {
-			b := bkt.Get([]byte(key))
-			if b == nil {
-				return dirty, nil
-			}
-			parsed := gjson.ParseBytes(b)
-			if !parsed.IsArray() {
-				return dirty, fmt.Errorf("ListGetAll: is not array")
-			}
-			results := parsed.Array()
-			for _, r := range results {
-				list = append(list, []byte(r.Raw))
+			c := bkt.Cursor()
+			for k, v := c.First(); k != nil; k, v = c.Next() {
+				items[string(k)] = v
 			}
 		}
 		return dirty, nil
 	})
-	return list, err
+	return items, err
 }

@@ -6,7 +6,7 @@ import (
 
 func GetServers() []ServerRaw {
 	r := make([]ServerRaw, 0)
-	raw, err := ListGetAll("touch", "servers")
+	raw, err := GetBucketAll("server")
 	if err == nil {
 		for _, b := range raw {
 			t, e := Bytes2ServerRaw(b)
@@ -20,17 +20,17 @@ func GetServers() []ServerRaw {
 	return r
 }
 
-func GetSubscriptions() []SubscriptionRaw {
-	r := make([]SubscriptionRaw, 0)
-	raw, err := ListGetAll("touch", "subscriptions")
+func GetSubscriptions() map[string]SubscriptionRaw {
+	r := make(map[string]SubscriptionRaw)
+	raw, err := GetBucketAll("subscription")
 	if err == nil {
-		for _, b := range raw {
+		for k, b := range raw {
 			t, e := Bytes2SubscriptionRaw(b)
 			if e != nil {
 				log.Warn("%v", e)
 				continue
 			}
-			r = append(r, *t)
+			r[k] = *t
 		}
 	}
 	return r

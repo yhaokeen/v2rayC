@@ -13,11 +13,11 @@ type ServerRaw struct {
 }
 
 type SubscriptionRaw struct {
-	Remarks string      `json:"remarks,omitempty"`
-	Address string      `json:"address"`
-	Status  string      `json:"status"` //update time, error info, etc.
-	Servers []ServerRaw `json:"servers"`
-	Info    string      `json:"info"` // maybe include some info from provider
+	Remarks string   `json:"remarks,omitempty"`
+	Address string   `json:"address"`
+	Status  string   `json:"status"` //update time, error info, etc.
+	Servers []string `json:"servers"`
+	Info    string   `json:"info"` // maybe include some info from provider
 }
 
 func Bytes2SubscriptionRaw(b []byte) (*SubscriptionRaw, error) {
@@ -29,7 +29,7 @@ func Bytes2SubscriptionRaw(b []byte) (*SubscriptionRaw, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.Servers = append(s.Servers, ServerRaw{ServerObj: obj})
+		// s.Servers = append(s.Servers, ServerRaw{ServerObj: obj})
 	}
 	if err := jsoniter.Unmarshal(b, &s); err != nil {
 		return nil, err
