@@ -6,7 +6,9 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/yhaokeen/v2rayC/pkg/logger"
 	"github.com/yhaokeen/v2rayC/ui/context"
+	"go.uber.org/zap"
 )
 
 type Model struct {
@@ -18,6 +20,8 @@ type Model struct {
 }
 
 func NewModel(ctx *context.AppContext, mode string) Model {
+	logger.Debug("创建列表模型", zap.String("mode", mode))
+
 	var columns []table.Column
 
 	// 根据模式设置不同的列
@@ -90,6 +94,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.height = msg.Height
 		m.table.SetWidth(msg.Width)
 		m.table.SetHeight(msg.Height - 4)
+		logger.Debug("调整列表大小", zap.Int("width", msg.Width), zap.Int("height", msg.Height-4))
 	}
 	m.table, cmd = m.table.Update(msg)
 	return m, cmd
@@ -102,6 +107,7 @@ func (m Model) View() string {
 
 // 更新表格数据
 func (m *Model) UpdateRows() {
+	logger.Debug("更新表格数据", zap.String("mode", m.mode))
 	rows := make([]table.Row, 0)
 
 	if m.mode == "subscription" {

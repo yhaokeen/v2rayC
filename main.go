@@ -4,10 +4,18 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/yhaokeen/v2rayC/pkg/logger"
 	"github.com/yhaokeen/v2rayC/ui"
+	"go.uber.org/zap"
 )
 
 func main() {
+	// 初始化日志，设置日志文件路径和日志级别
+	logger.Init("./logs/v2rayc.log", "debug")
+
+	// 记录一条启动日志
+	logger.Info("应用启动", zap.String("version", "1.0.0"))
+
 	// 创建程序，启用鼠标支持和设置初始窗口大小
 	p := tea.NewProgram(
 		ui.NewModel(),

@@ -5,11 +5,12 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-
+	"github.com/yhaokeen/v2rayC/pkg/logger"
 	"github.com/yhaokeen/v2rayC/ui/components/header"
 	"github.com/yhaokeen/v2rayC/ui/components/list"
 	"github.com/yhaokeen/v2rayC/ui/components/tabs"
 	"github.com/yhaokeen/v2rayC/ui/context"
+	"go.uber.org/zap"
 )
 
 // 主应用模型
@@ -27,6 +28,7 @@ type Model struct {
 // 初始化主模型
 func NewModel() Model {
 	ctx := context.NewAppContext()
+	logger.Info("初始化UI模型")
 
 	return Model{
 		ctx:         ctx,
@@ -38,6 +40,7 @@ func NewModel() Model {
 }
 
 func (m Model) Init() tea.Cmd {
+	logger.Debug("UI初始化")
 	// 组合所有组件的初始化命令
 	return tea.Batch(
 		m.header.Init(),
@@ -55,8 +58,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// 处理按键事件
+		logger.Debug("按键事件", zap.String("key", msg.String()))
 		switch msg.String() {
 		case "q", "ctrl+c":
+			logger.Info("用户退出应用")
 			return m, tea.Quit
 		}
 	// case tea.MouseMsg:
@@ -66,9 +71,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		logger.Debug("窗口大小变化", zap.Int("width", msg.Width), zap.Int("height", msg.Height))
 	case tabs.TabChangedMsg:
 		m.currentView = msg.Tab
 		m.list = list.NewModel(m.ctx, strings.ToLower(msg.Tab))
+		logger.Info("切换标签", zap.String("tab", msg.Tab))
 	}
 
 	// 更新header
